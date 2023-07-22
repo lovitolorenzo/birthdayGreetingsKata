@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { createTransport, Transporter } from "nodemailer";
+import path from "path";
 
 interface Employee {
 	firstName: string;
@@ -39,7 +40,7 @@ export class BirthdayGreetingService {
 	public async findEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
 		const today = new Date();
 		// Fetches data from the file
-		const data = fs.readFileSync(fileName, "utf-8");
+		const data = fs.readFileSync(path.join(__dirname, fileName), "utf-8");
 		// Gets the lines where each line is a different employee
 		const lines = data.split("\n").slice(1);
 
