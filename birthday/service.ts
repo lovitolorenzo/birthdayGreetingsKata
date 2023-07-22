@@ -19,6 +19,45 @@ export class BirthdayService {
 		this.smtpPort = smtpPort;
 	}
 
+	public async findEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
+		const today = new Date();
+		// Fetches data from the file
+		const data = fs.readFileSync(fileName, "utf-8");
+		// Gets the lines where each line is a different employee
+		const lines = data.split("\n").slice(1);
+
+		let sentEmailsTo: Employee[] = [];
+
+		for (const line of lines) {
+			// Retrieves employee's data based on their position, assuming they follow the same pattern as last_name, first_name, date_of_birth, email
+			const [lastName, firstName, email, birthday] = line.split(", ");
+
+			// Gets year, month and day from birthday's string and convert them into a Date type
+			const [year, month, day] = birthday.split("/").map((dateElement) => Number(dateElement));
+			let birthdayDate = new Date(year, month, day);
+
+			// Checks if it's a non-leap year and the birthday is on February 29
+			// Months are 0 indexed so February will be 1
+			if (!this.isLeapYear(today) && birthdayDate.getDate() === 29 && birthdayDate.getMonth() === 1) {
+				birthdayDate = new Date(year, month, 28); // Set to February 28
+			}
+
+			// If It finds the birthday then It builds up the payload to send the email to the birthday person
+			if (this.isTodayBirthday(today, birthdayDate)) {
+				sentEmailsTo.push({ firstName, lastName, email, birthday });
+			}
+		}
+
+		// Executes all togheter the email sending
+		await Promise.all(
+			sentEmailsTo.map((emailData) =>
+				this.sendBirthdayEmail(this.senderEmail, emailData, this.smtpHost, this.smtpPort),
+			),
+		);
+
+		return sentEmailsTo;
+	}
+
 	public async sendBirthdayEmail(
 		senderEmail: string,
 		employeeData: Employee,
