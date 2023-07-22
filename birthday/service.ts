@@ -19,6 +19,15 @@ export class BirthdayService {
 		this.smtpPort = smtpPort;
 	}
 
+	// Compares today's date to employee's birthday
+	private isTodayBirthday(today: Date, birthday: Date): boolean {
+		return (
+			today.getFullYear() === birthday.getFullYear() &&
+			today.getMonth() === birthday.getMonth() &&
+			today.getDate() === birthday.getDate()
+		);
+	}
+
 	public async findEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
 		const today = new Date();
 		// Fetches data from the file
