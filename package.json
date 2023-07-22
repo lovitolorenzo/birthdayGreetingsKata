@@ -18,6 +18,12 @@
   },
   "homepage": "https://github.com/lovitolorenzo/birthdayGreetingsKata#readme",
   "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@types/nodemailer": "^6.4.8",
     "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "nodemailer": "^6.9.4"
   }
 }
