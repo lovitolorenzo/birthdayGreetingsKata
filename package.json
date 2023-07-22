@@ -1,29 +1,31 @@
 {
-  "name": "birthdaygreetingskata",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lovitolorenzo/birthdayGreetingsKata.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lovitolorenzo/birthdayGreetingsKata/issues"
-  },
-  "homepage": "https://github.com/lovitolorenzo/birthdayGreetingsKata#readme",
-  "devDependencies": {
-    "@types/node": "^20.4.2",
-    "@types/nodemailer": "^6.4.8",
-    "typescript": "^5.1.6"
-  },
-  "dependencies": {
-    "fs": "^0.0.1-security",
-    "nodemailer": "^6.9.4"
-  }
+	"name": "birthdaygreetingskata",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node main.js",
+		"build": "tsc"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lovitolorenzo/birthdayGreetingsKata.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/lovitolorenzo/birthdayGreetingsKata/issues"
+	},
+	"homepage": "https://github.com/lovitolorenzo/birthdayGreetingsKata#readme",
+	"devDependencies": {
+		"@types/node": "^20.4.2",
+		"@types/nodemailer": "^6.4.8",
+		"typescript": "^5.1.6"
+	},
+	"dependencies": {
+		"fs": "^0.0.1-security",
+		"nodemailer": "^6.9.4"
+	}
 }

@@ -1,8 +1,8 @@
 import { BirthdayGreetingService } from "./service";
 
-export async function main(args: string[]): Promise<void> {
+(async function main(): Promise<void> {
 	const birthdayService = new BirthdayGreetingService("lovitolorenzo23@gmail.com", "smtp.gmail.com", 587);
-	const employeeWhoReceivedGreetings = await birthdayService.findEmployeesBirthdaysAndSendEmails("employeeData.txt");
+	const employeeWhoReceivedGreetings = await birthdayService.findEmployeesBirthdaysAndSendEmails("./employeeData.txt");
 
 	console.log(
 		employeeWhoReceivedGreetings
@@ -11,4 +11,4 @@ export async function main(args: string[]): Promise<void> {
 					.join(", ")}`
 			: `No employees have received the greetings email!`,
 	);
-}
+})();
