@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import { createTransport, Transporter } from "nodemailer";
 import path from "path";
+import dotenv from "dotenv";
+dotenv.config();
 
 interface Employee {
 	firstName: string;
@@ -49,6 +51,7 @@ export class BirthdayGreetingService {
 
 			if (lines === null) return [];
 
+			let toSendEmails: Employee[] = [];
 			let sentEmailsTo: Employee[] = [];
 
 			for (const line of lines) {
@@ -62,22 +65,22 @@ export class BirthdayGreetingService {
 				// Checks if it's a non-leap year and the birthday is on February 29
 				// Months are 0 indexed so February will be 1
 				if (!this.isLeapYear(today) && birthdayDate.getDate() === 29 && birthdayDate.getMonth() === 1) {
-					birthdayDate = new Date(year, month, 28); // Set to February 28
+					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Set to February 28
 				}
 
 				// If It finds the birthday then It builds up the payload to send the email to the birthday person
 				if (this.isTodayBirthday(today, birthdayDate)) {
-					sentEmailsTo.push({ firstName, lastName, email, birthday });
+					toSendEmails.push({ firstName, lastName, birthday, email });
 				}
 			}
 
 			// Executes all togheter the email sending
 			await Promise.all(
-				sentEmailsTo.map((emailData) =>
-					this.sendBirthdayEmail(this.senderEmail, emailData, this.smtpHost, this.smtpPort),
-				),
+				toSendEmails.map(async (emailData) => {
+					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData, this.smtpHost, this.smtpPort);
+					sentEmail && sentEmailsTo.push(emailData);
+				}),
 			);
-
 			return sentEmailsTo;
 		} catch (error) {
 			console.error("Error reading or processing file: ", error);
@@ -90,12 +93,16 @@ export class BirthdayGreetingService {
 		employeeData: Employee,
 		smtpHost: string,
 		smtpPort: number,
-	): Promise<void> {
+	): Promise<boolean> {
 		// Creates a mail transporter
 		const transporter: Transporter = createTransport({
 			host: smtpHost,
 			port: smtpPort,
-			secure: false, // Sets this to true if using SSL
+			secure: false,
+			auth: {
+				user: process.env.GMAIL_EMAIL,
+				pass: process.env.GMAIL_PASSWORD,
+			},
 		});
 
 		// Constructs the message
@@ -108,9 +115,11 @@ export class BirthdayGreetingService {
 
 		try {
 			// Sends the mail
-			const sentEmail = await transporter.sendMail(message);
+			await transporter.sendMail(message);
+			return true;
 		} catch (error) {
 			console.error("Error sending email: ", error);
+			return false;
 		}
 	}
 }
