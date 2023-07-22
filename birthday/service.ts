@@ -18,4 +18,34 @@ export class BirthdayService {
 		this.smtpHost = smtpHost;
 		this.smtpPort = smtpPort;
 	}
+
+	public async sendBirthdayEmail(
+		senderEmail: string,
+		employeeData: Employee,
+		smtpHost: string,
+		smtpPort: number,
+	): Promise<void> {
+		// Creates a mail transporter
+		const transporter: Transporter = createTransport({
+			host: smtpHost,
+			port: smtpPort,
+			secure: false, // Sets this to true if using SSL
+		});
+
+		// Constructs the message
+		const message = {
+			from: senderEmail,
+			to: employeeData.email,
+			subject: "Happy Birthday!",
+			text: `Happy Birthday, dear ${employeeData.firstName}`,
+		};
+
+		try {
+			// Sends the mail
+			const sentEmail = await transporter.sendMail(message);
+			console.log("Email correctly sned : ", sentEmail);
+		} catch (error) {
+			console.error("Error sending email: ", error);
+		}
+	}
 }
