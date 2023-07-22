@@ -28,6 +28,14 @@ export class BirthdayService {
 		);
 	}
 
+	// Checks if is a leap year
+	private isLeapYear(today: Date): boolean {
+		const year = today.getFullYear();
+
+		// If there is no rest from year % 4 then true will be returned else It will be false
+		return year % 4 === 0;
+	}
+
 	public async findEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
 		const today = new Date();
 		// Fetches data from the file
