@@ -8,7 +8,7 @@ interface Employee {
 	birthday: string;
 }
 
-export class BirthdayService {
+export class BirthdayGreetingService {
 	private senderEmail: string;
 	private smtpHost: string;
 	private smtpPort: number;
