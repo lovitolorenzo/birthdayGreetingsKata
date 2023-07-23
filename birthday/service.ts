@@ -67,7 +67,13 @@ export class BirthdayGreetingService {
 
 				// Checks if it's a non-leap year and the birthday is on February 29
 				// Months are 0 indexed so February will be 1
-				if (!this.isLeapYear(today) && birthdayDate.getDate() === 29 && birthdayDate.getMonth() === 1) {
+				if (
+					today.getMonth() === 1 &&
+					today.getDate() === 28 &&
+					!this.isLeapYear(today) &&
+					birthdayDate.getDate() === 29 &&
+					birthdayDate.getMonth() === 1
+				) {
 					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Set to February 28
 				}
 
