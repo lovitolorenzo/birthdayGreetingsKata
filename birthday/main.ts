@@ -1,7 +1,7 @@
 import { BirthdayGreetingService } from "./service";
 
 (async function main(): Promise<void> {
-	const birthdayService = new BirthdayGreetingService("lovitolorenzo23@gmail.com", "smtp.gmail.com", 587);
+	const birthdayService = new BirthdayGreetingService("lovitolorenzo23@gmail.com");
 	const employeeWhoReceivedGreetings = await birthdayService.findEmployeesBirthdaysAndSendEmails("employeeData.txt");
 
 	console.log(

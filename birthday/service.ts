@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import { createTransport, Transporter } from "nodemailer";
+import { google } from "googleapis";
 import path from "path";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 interface Employee {
@@ -11,15 +13,16 @@ interface Employee {
 	birthday: string;
 }
 
+const OAuth2 = google.auth.OAuth2;
+
+const OAuth2_client = new OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
+OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+
 export class BirthdayGreetingService {
 	private senderEmail: string;
-	private smtpHost: string;
-	private smtpPort: number;
 
-	constructor(senderEmail: string, smtpHost: string, smtpPort: number) {
+	constructor(senderEmail: string) {
 		this.senderEmail = senderEmail;
-		this.smtpHost = smtpHost;
-		this.smtpPort = smtpPort;
 	}
 
 	// Compares today's date to employee's birthday
@@ -77,7 +80,7 @@ export class BirthdayGreetingService {
 			// Executes all togheter the email sending
 			await Promise.all(
 				toSendEmails.map(async (emailData) => {
-					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData, this.smtpHost, this.smtpPort);
+					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData);
 					sentEmail && sentEmailsTo.push(emailData);
 				}),
 			);
@@ -88,20 +91,17 @@ export class BirthdayGreetingService {
 		}
 	}
 
-	public async sendBirthdayEmail(
-		senderEmail: string,
-		employeeData: Employee,
-		smtpHost: string,
-		smtpPort: number,
-	): Promise<boolean> {
+	public async sendBirthdayEmail(senderEmail: string, employeeData: Employee): Promise<boolean> {
 		// Creates a mail transporter
 		const transporter: Transporter = createTransport({
-			host: smtpHost,
-			port: smtpPort,
-			secure: false,
+			service: "gmail",
 			auth: {
+				type: "OAuth2",
 				user: process.env.GMAIL_EMAIL,
-				pass: process.env.GMAIL_PASSWORD,
+				clientId: process.env.GOOGLE_CLIENT_ID,
+				clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+				refreshToken: process.env.REFRESH_TOKEN,
+				accessToken: process.env.ACCESS_TOKEN,
 			},
 		});
 
