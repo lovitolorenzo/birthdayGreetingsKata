@@ -63,7 +63,7 @@ export class BirthdayGreetingService {
 
 				// Gets year, month and day from birthday's string and convert them into a Date type
 				const [year, month, day] = birthday.split("/").map((dateElement) => Number(dateElement));
-				let birthdayDate = new Date(year, month - 1, day); // months in javascript's Date are 0 indexed
+				let birthdayDate = new Date(year, month - 1, day); // Months in javascript's Date are 0 indexed
 
 				// Checks if it's a non-leap year and the birthday is on February 29
 				// Months are 0 indexed so February will be 1
@@ -74,7 +74,7 @@ export class BirthdayGreetingService {
 					birthdayDate.getDate() === 29 &&
 					birthdayDate.getMonth() === 1
 				) {
-					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Set to February 28
+					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Sets to February 28
 				}
 
 				// If It finds the birthday then It builds up the payload to send the email to the birthday person
