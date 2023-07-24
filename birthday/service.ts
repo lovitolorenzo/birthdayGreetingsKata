@@ -4,6 +4,9 @@ import { google } from "googleapis";
 import path from "path";
 import dotenv from "dotenv";
 
+import { Employee as EmployeesSchema } from "./schema/employees";
+import { Employee as EmployeeModel } from "./models/Employee";
+
 dotenv.config();
 
 interface Employee {
@@ -27,11 +30,7 @@ export class BirthdayGreetingService {
 
 	// Compares today's date to employee's birthday
 	private isTodayBirthday(today: Date, birthday: Date): boolean {
-		return (
-			today.getFullYear() === birthday.getFullYear() &&
-			today.getMonth() === birthday.getMonth() &&
-			today.getDate() === birthday.getDate()
-		);
+		return today.getMonth() === birthday.getMonth() && today.getDate() === birthday.getDate();
 	}
 
 	// Checks if is a leap year
@@ -42,7 +41,7 @@ export class BirthdayGreetingService {
 		return year % 4 === 0;
 	}
 
-	public async findEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
+	public async findInFsEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
 		try {
 			const today = new Date();
 
@@ -77,7 +76,7 @@ export class BirthdayGreetingService {
 					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Sets to February 28
 				}
 
-				// If It finds the birthday then It builds up the payload to send the email to the birthday person
+				// If It finds the birthday then It saves the person
 				if (this.isTodayBirthday(today, birthdayDate)) {
 					toSendEmails.push({ firstName, lastName, birthday, email });
 				}
@@ -90,6 +89,73 @@ export class BirthdayGreetingService {
 					sentEmail && sentEmailsTo.push(emailData);
 				}),
 			);
+
+			return sentEmailsTo;
+		} catch (error) {
+			console.error("Error reading or processing file: ", error);
+			return [];
+		}
+	}
+
+	public async findInMongoDbEmployeesBirthdaysAndSendEmails(): Promise<Employee[]> {
+		try {
+			const today = new Date();
+
+			console.log("today: ", today);
+
+			// Fetches data from DB's collection
+			const employees: EmployeeModel[] = await EmployeesSchema.find();
+			console.log("employees: ", employees);
+
+			// Gets the employees
+			if (employees.length === 0) return [];
+
+			let toSendEmails: Employee[] = [];
+			let sentEmailsTo: Employee[] = [];
+
+			for (const employee of employees) {
+				console.log("employee: ", employee);
+
+				const { lastName, firstName, email } = employee;
+				let { birthday } = employee;
+
+				console.log(today.getDate() === birthday.getDate());
+				console.log(today.getMonth() === birthday.getMonth());
+				console.log(today.getFullYear() === birthday.getFullYear());
+
+				// Checks if it's a non-leap year and the birthday is on February 29
+				// Months are 0 indexed so February will be 1
+				if (
+					today.getMonth() === 1 &&
+					today.getDate() === 28 &&
+					!this.isLeapYear(today) &&
+					birthday.getDate() === 29 &&
+					birthday.getMonth() === 1
+				) {
+					birthday = new Date(birthday.getFullYear(), birthday.getMonth(), 28); // Sets to February 28
+				}
+
+				// If It finds the birthday then It saves the person
+				if (this.isTodayBirthday(today, birthday)) {
+					{
+						toSendEmails.push({
+							firstName: firstName.toString(),
+							lastName: lastName.toString(),
+							birthday: birthday.toString(),
+							email: email.toString(),
+						});
+					}
+				}
+			}
+
+			// Executes all togheter the email sending
+			await Promise.all(
+				toSendEmails.map(async (emailData) => {
+					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData);
+					sentEmail && sentEmailsTo.push(emailData);
+				}),
+			);
+
 			return sentEmailsTo;
 		} catch (error) {
 			console.error("Error reading or processing file: ", error);
