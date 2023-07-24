@@ -101,11 +101,8 @@ export class BirthdayGreetingService {
 		try {
 			const today = new Date();
 
-			console.log("today: ", today);
-
 			// Fetches data from DB's collection
 			const employees: EmployeeModel[] = await EmployeesSchema.find();
-			console.log("employees: ", employees);
 
 			// Gets the employees
 			if (employees.length === 0) return [];
@@ -114,14 +111,8 @@ export class BirthdayGreetingService {
 			let sentEmailsTo: Employee[] = [];
 
 			for (const employee of employees) {
-				console.log("employee: ", employee);
-
 				const { lastName, firstName, email } = employee;
 				let { birthday } = employee;
-
-				console.log(today.getDate() === birthday.getDate());
-				console.log(today.getMonth() === birthday.getMonth());
-				console.log(today.getFullYear() === birthday.getFullYear());
 
 				// Checks if it's a non-leap year and the birthday is on February 29
 				// Months are 0 indexed so February will be 1
