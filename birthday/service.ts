@@ -4,16 +4,16 @@ import { google } from "googleapis";
 import path from "path";
 import dotenv from "dotenv";
 
-import { Employee as EmployeesSchema } from "./schema/employees";
-import { Employee as EmployeeModel } from "./models/Employee";
+import { EmployeesSchema } from "./schema/employees";
+import { EmployeeModel } from "./models/Employee";
 
 dotenv.config();
 
-interface Employee {
+export interface Employee {
 	firstName: string;
 	lastName: string;
 	email: string;
-	birthday: string;
+	birthday: Date;
 }
 
 const OAuth2 = google.auth.OAuth2;
@@ -29,7 +29,7 @@ export class BirthdayGreetingService {
 	}
 
 	// Compares today's date to employee's birthday
-	private isTodayBirthday(today: Date, birthday: Date): boolean {
+	public isTodayBirthday(today: Date, birthday: Date): boolean {
 		return today.getMonth() === birthday.getMonth() && today.getDate() === birthday.getDate();
 	}
 
@@ -41,7 +41,7 @@ export class BirthdayGreetingService {
 		return year % 4 === 0;
 	}
 
-	public async findInFsEmployeesBirthdaysAndSendEmails(fileName: string): Promise<Employee[]> {
+	public async fetchEmployeesDataFromFs(fileName: string): Promise<Employee[]> {
 		try {
 			const today = new Date();
 
@@ -53,8 +53,7 @@ export class BirthdayGreetingService {
 
 			if (lines === null) return [];
 
-			let toSendEmails: Employee[] = [];
-			let sentEmailsTo: Employee[] = [];
+			let employees: Employee[] = [];
 
 			for (const line of lines) {
 				// Retrieves employee's data based on their position, assuming they follow the same pattern as last_name, first_name, date_of_birth, email
@@ -76,21 +75,10 @@ export class BirthdayGreetingService {
 					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Sets to February 28
 				}
 
-				// If It finds the birthday then It saves the person
-				if (this.isTodayBirthday(today, birthdayDate)) {
-					toSendEmails.push({ firstName, lastName, birthday, email });
-				}
+				employees.push({ firstName, lastName, birthday: birthdayDate, email });
 			}
 
-			// Executes all togheter the email sending
-			await Promise.all(
-				toSendEmails.map(async (emailData) => {
-					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData);
-					sentEmail && sentEmailsTo.push(emailData);
-				}),
-			);
-
-			return sentEmailsTo;
+			return employees;
 		} catch (error) {
 			console.error("Error reading or processing file: ", error);
 			return [];
@@ -132,7 +120,7 @@ export class BirthdayGreetingService {
 						toSendEmails.push({
 							firstName: firstName.toString(),
 							lastName: lastName.toString(),
-							birthday: birthday.toString(),
+							birthday: birthday,
 							email: email.toString(),
 						});
 					}
