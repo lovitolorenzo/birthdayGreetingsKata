@@ -1,21 +1,34 @@
 import mongoose from "mongoose";
 import { BirthdayGreetingService } from "./service";
 import dotenv from "dotenv";
+import { Employee } from "./service";
 
 dotenv.config();
 
 (async function main(): Promise<void> {
-	const birthdayService = new BirthdayGreetingService("lovitolorenzo23@gmail.com");
+	let employeeWhoReceivedGreetings: Employee[] = [];
 
-	// const employeeWhoReceivedGreetings = await birthdayService.findInFsEmployeesBirthdaysAndSendEmails(
-	// 	"employeeData.txt",
-	// );
+	const birthdayService = new BirthdayGreetingService("lovitolorenzotry@gmail.com");
 
-	await connectToMongoDB();
+	const employeesFs = await birthdayService.parseEmployeesDataFromFs("employeeData.txt");
 
-	const employeeWhoReceivedGreetings = await birthdayService.findInMongoDbEmployeesBirthdaysAndSendEmails();
+	const today = new Date();
 
-	mongoose.connection.close();
+	const toSendEmails = await birthdayService.findBirthdays(today, employeesFs);
+
+	// Executes all togheter the email sending
+	await Promise.all(
+		toSendEmails.map(async (emailData) => {
+			const employeesFs = await birthdayService.sendBirthdayEmail("lovitolorenzotry@gmail.com", emailData);
+			employeesFs && employeeWhoReceivedGreetings.push(emailData);
+		}),
+	);
+
+	// await connectToMongoDB();
+
+	//  const employeeWhoReceivedGreetings = await birthdayService.findInMongoDbEmployeesBirthdaysAndSendEmails();
+
+	// mongoose.connection.close();
 
 	console.log(
 		employeeWhoReceivedGreetings.length > 0
