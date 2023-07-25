@@ -142,6 +142,22 @@ export class BirthdayGreetingService {
 		}
 	}
 
+	public async findBirthdays(today: Date, employees: Employee[]): Promise<Employee[]> {
+		let toSendEmails: Employee[] = [];
+
+		for (const employee of employees) {
+			this.isTodayBirthday(today, employee.birthday) &&
+				toSendEmails.push({
+					firstName: employee.firstName,
+					lastName: employee.lastName,
+					birthday: employee.birthday,
+					email: employee.email,
+				});
+		}
+
+		return toSendEmails;
+	}
+
 	public async sendBirthdayEmail(senderEmail: string, employeeData: Employee): Promise<boolean> {
 		// Creates a mail transporter
 		const transporter: Transporter = createTransport({
