@@ -72,10 +72,10 @@ export class BirthdayGreetingService {
 					birthdayDate.getDate() === 29 &&
 					birthdayDate.getMonth() === 1
 				) {
-					birthdayDate = new Date(birthdayDate.getFullYear(), birthdayDate.getMonth(), 28); // Sets to February 28
+					birthdayDate.setDate(28);
 				}
 
-				employees.push({ firstName, lastName, birthday: birthdayDate, email });
+				employees.push({ firstName, lastName, email, birthday: birthdayDate });
 			}
 
 			return employees;
@@ -85,7 +85,7 @@ export class BirthdayGreetingService {
 		}
 	}
 
-	public async findInMongoDbEmployeesBirthdaysAndSendEmails(): Promise<Employee[]> {
+	public async parseEmployeesDataFromMongoDb(): Promise<Employee[]> {
 		try {
 			const today = new Date();
 
@@ -95,8 +95,7 @@ export class BirthdayGreetingService {
 			// Gets the employees
 			if (employees.length === 0) return [];
 
-			let toSendEmails: Employee[] = [];
-			let sentEmailsTo: Employee[] = [];
+			let filteredEmployees: Employee[] = [];
 
 			for (const employee of employees) {
 				const { lastName, firstName, email } = employee;
@@ -111,31 +110,18 @@ export class BirthdayGreetingService {
 					birthday.getDate() === 29 &&
 					birthday.getMonth() === 1
 				) {
-					birthday = new Date(birthday.getFullYear(), birthday.getMonth(), 28); // Sets to February 28
+					birthday.setDate(28); // Sets to February 28
 				}
 
-				// If It finds the birthday then It saves the person
-				if (this.isTodayBirthday(today, birthday)) {
-					{
-						toSendEmails.push({
-							firstName: firstName.toString(),
-							lastName: lastName.toString(),
-							birthday: birthday,
-							email: email.toString(),
-						});
-					}
-				}
+				filteredEmployees.push({
+					lastName: lastName.toString(),
+					firstName: firstName.toString(),
+					email: email.toString(),
+					birthday,
+				});
 			}
 
-			// Executes all togheter the email sending
-			await Promise.all(
-				toSendEmails.map(async (emailData) => {
-					const sentEmail = await this.sendBirthdayEmail(this.senderEmail, emailData);
-					sentEmail && sentEmailsTo.push(emailData);
-				}),
-			);
-
-			return sentEmailsTo;
+			return filteredEmployees;
 		} catch (error) {
 			console.error("Error reading or processing file: ", error);
 			return [];
