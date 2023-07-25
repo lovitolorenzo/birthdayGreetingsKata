@@ -12,6 +12,14 @@ dotenv.config();
 
 	const employeesFs = await birthdayService.parseEmployeesDataFromFs("employeeData.txt");
 
+	// Replace this code with the line above to work with MongoDB setting instead of FS
+
+	// await connectToMongoDB();
+
+	// const employeesMongoDb = await birthdayService.parseEmployeesDataFromMongoDb();
+
+	// mongoose.connection.close();
+
 	const today = new Date();
 
 	const toSendEmails = await birthdayService.findBirthdays(today, employeesFs);
@@ -19,16 +27,10 @@ dotenv.config();
 	// Executes all togheter the email sending
 	await Promise.all(
 		toSendEmails.map(async (emailData) => {
-			const employeesFs = await birthdayService.sendBirthdayEmail("lovitolorenzotry@gmail.com", emailData);
-			employeesFs && employeeWhoReceivedGreetings.push(emailData);
+			const sentMail = await birthdayService.sendBirthdayEmail("lovitolorenzotry@gmail.com", emailData);
+			sentMail && employeeWhoReceivedGreetings.push(emailData);
 		}),
 	);
-
-	// await connectToMongoDB();
-
-	//  const employeeWhoReceivedGreetings = await birthdayService.findInMongoDbEmployeesBirthdaysAndSendEmails();
-
-	// mongoose.connection.close();
 
 	console.log(
 		employeeWhoReceivedGreetings.length > 0
@@ -42,10 +44,10 @@ dotenv.config();
 export async function connectToMongoDB(): Promise<void> {
 	try {
 		if (!process.env.DATABASE_URI || !process.env.DATABASE_NAME) {
-			throw new Error("Missing DB env vars");
+			throw new Error("Missing DB env vars!");
 		}
 		await mongoose.connect(process.env.DATABASE_URI, { dbName: process.env.DATABASE_NAME });
-		console.log("Connection with Mongodb successful");
+		console.log("Successfully connected with MongoDB!");
 	} catch (error) {
 		console.error(error);
 		process.exit(1);
