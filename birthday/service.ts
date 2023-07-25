@@ -41,7 +41,7 @@ export class BirthdayGreetingService {
 		return year % 4 === 0;
 	}
 
-	public async fetchEmployeesDataFromFs(fileName: string): Promise<Employee[]> {
+	public async parseEmployeesDataFromFs(fileName: string): Promise<Employee[]> {
 		try {
 			const today = new Date();
 
@@ -51,7 +51,7 @@ export class BirthdayGreetingService {
 			// Gets the lines where each line is a different employee
 			const lines = data.match(/[^\r\n]+/g);
 
-			if (lines === null) return [];
+			if (!lines) return [];
 
 			let employees: Employee[] = [];
 
