@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Employee as EmployeeModel } from "../models/Employee";
+import { EmployeeModel } from "../models/Employee";
 
 const EmployeeSchema = new mongoose.Schema({
 	lastName: {
@@ -35,4 +35,4 @@ EmployeeSchema.set("toJSON", {
 	},
 });
 
-export const Employee = mongoose.model<EmployeeModel>("employees", EmployeeSchema, "employees");
+export const EmployeesSchema = mongoose.model<EmployeeModel>("employees", EmployeeSchema, "employees");

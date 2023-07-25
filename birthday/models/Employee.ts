@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export interface Employee {
+export interface EmployeeModel {
 	id: Types.ObjectId;
 	lastName: String;
 	firstName: String;
