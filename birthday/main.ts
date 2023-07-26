@@ -10,17 +10,17 @@ dotenv.config();
 
 	const birthdayService = new BirthdayGreetingService();
 
-	const employeesFs = await birthdayService.parseEmployeesDataFromFs("employeeData.txt");
+	const today = new Date();
+
+	const employeesFs = await birthdayService.parseEmployeesDataFromFs(today, "employeeData.txt");
 
 	// Replace this code with the line above to work with MongoDB setting instead of FS
 
 	// await connectToMongoDB();
 
-	// const employeesMongoDb = await birthdayService.parseEmployeesDataFromMongoDb();
+	// const employeesMongoDb = await birthdayService.parseEmployeesDataFromMongoDb(today);
 
 	// mongoose.connection.close();
-
-	const today = new Date();
 
 	const toSendEmails = await birthdayService.findBirthdays(today, employeesFs);
 

@@ -35,10 +35,8 @@ export class BirthdayGreetingService {
 		return year % 4 === 0;
 	}
 
-	public async parseEmployeesDataFromFs(fileName: string): Promise<Employee[]> {
+	public async parseEmployeesDataFromFs(today: Date, fileName: string): Promise<Employee[]> {
 		try {
-			const today = new Date();
-
 			// Fetches data from the file
 			const data = fs.readFileSync(path.join(__dirname, fileName), "utf-8");
 
@@ -79,15 +77,13 @@ export class BirthdayGreetingService {
 		}
 	}
 
-	public async parseEmployeesDataFromMongoDb(): Promise<Employee[]> {
+	public async parseEmployeesDataFromMongoDb(today: Date): Promise<Employee[]> {
 		try {
-			const today = new Date();
-
 			// Fetches data from DB's collection
 			const employees: EmployeeModel[] = await EmployeesSchema.find();
 
 			// Gets the employees
-			if (employees.length === 0) return [];
+			if (!employees) return [];
 
 			let filteredEmployees: Employee[] = [];
 
