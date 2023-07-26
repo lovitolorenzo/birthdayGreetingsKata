@@ -22,12 +22,6 @@ const OAuth2_client = new OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGL
 OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 export class BirthdayGreetingService {
-	private senderEmail: string;
-
-	constructor(senderEmail: string) {
-		this.senderEmail = senderEmail;
-	}
-
 	// Compares today's date to employee's birthday
 	public isTodayBirthday(today: Date, birthday: Date): boolean {
 		return today.getMonth() === birthday.getMonth() && today.getDate() === birthday.getDate();

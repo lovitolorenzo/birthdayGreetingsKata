@@ -8,7 +8,7 @@ dotenv.config();
 (async function main(): Promise<void> {
 	let employeeWhoReceivedGreetings: Employee[] = [];
 
-	const birthdayService = new BirthdayGreetingService("lovitolorenzotry@gmail.com");
+	const birthdayService = new BirthdayGreetingService();
 
 	const employeesFs = await birthdayService.parseEmployeesDataFromFs("employeeData.txt");
 
